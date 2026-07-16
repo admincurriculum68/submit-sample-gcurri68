@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - ระบบส่งหลักสูตรสถานศึกษา</title>
+    <link rel="stylesheet" href="css/tailwind.css" />
+    <style>
+      :root {
+        --sidebar-expanded: 260px;
+        --sidebar-collapsed: 88px;
+        --sidebar-open-duration: 420ms;
+        --sidebar-close-duration: 250ms;
+      }
+
+      body {
+        font-family: "Sarabun", "Noto Sans Thai", Tahoma, sans-serif;
+        background: radial-gradient(circle at 10% 10%, #e2e8f0 0%, #f8fafc 45%, #ffffff 100%);
+      }
+
+      .app-shell {
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        width: var(--sidebar-expanded);
+        opacity: 1;
+        transition:
+          width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+          transform var(--sidebar-close-duration) cubic-bezier(0.4, 0, 1, 1),
+          opacity 0.2s ease;
+        will-change: transform, width, opacity;
+      }
+
+      .sidebar.is-mobile-opening {
+        transition:
+          width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+          transform var(--sidebar-open-duration) cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.28s ease;
+      }
+
+      .sidebar.is-mobile-closing {
+        transition:
+          width 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+          transform var(--sidebar-close-duration) cubic-bezier(0.4, 0, 1, 1),
+          opacity 0.2s ease;
+      }
+
+      .sidebar.is-collapsed {
+        width: var(--sidebar-collapsed);
+      }
+
+      .sidebar.is-collapsed .label,
+      .sidebar.is-collapsed .brand-copy,
+      .sidebar.is-collapsed .profile-text,
+      .sidebar.is-collapsed .footer-text {
+        display: none;
+      }
+
+      .sidebar.is-collapsed .menu-item {
+        justify-content: center;
+        gap: 0;
+      }
+
+      .sidebar.is-collapsed .menu-item .icon {
+        margin-right: 0;
+      }
+
+      .menu-item {
+        gap: 0.75rem;
+      }
+
+      .menu-item .icon {
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .menu-item .icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .content-area {
+        min-height: 100vh;
+      }
+
+      .menu-item.active {
+        background-color: #e2e8f0;
+        color: #0f172a;
+      }
+
+      #mobile-menu-open,
+      #mobile-sidebar-overlay {
+        display: none;
+      }
+
+      @media (max-width: 1024px) {
+        .app-shell {
+          position: relative;
+        }
+
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: min(82vw, 320px) !important;
+          max-width: 320px;
+          z-index: 50;
+          transform: translateX(-100%);
+          opacity: 0.98;
+          box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);
+          overflow-y: auto;
+        }
+
+        .sidebar.is-mobile-open {
+          transform: translateX(0);
+          opacity: 1;
+        }
+
+        #mobile-menu-open {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        #mobile-sidebar-overlay {
+          display: block;
+          position: fixed;
+          inset: 0;
+          background: rgba(2, 6, 23, 0.35);
+          z-index: 45;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.28s ease;
+        }
+
+        #mobile-sidebar-overlay.is-visible {
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        body.mobile-nav-open {
+          overflow: hidden;
+        }
+
+        #toggle-sidebar {
+          display: none;
+        }
+
+        .content-area {
+          min-height: auto;
+        }
+
+        .sidebar.is-collapsed {
+          width: min(82vw, 320px) !important;
+        }
+
+        .sidebar.is-collapsed .label,
+        .sidebar.is-collapsed .brand-copy,
+        .sidebar.is-collapsed .profile-text,
+        .sidebar.is-collapsed .footer-text {
+          display: block;
+        }
+
+        .sidebar.is-collapsed .menu-item {
+          justify-content: flex-start;
+          gap: 0.75rem;
+        }
+      }
+
+      @supports (padding: max(0px)) {
+        @media (max-width: 1024px) {
+          .sidebar {
+            padding-top: max(0px, env(safe-area-inset-top));
+            padding-bottom: max(0px, env(safe-area-inset-bottom));
+          }
+
+          #mobile-menu-open {
+            top: max(0.75rem, env(safe-area-inset-top));
+            left: max(0.75rem, env(safe-area-inset-left));
+          }
+
+          .content-area {
+            padding-bottom: max(0px, env(safe-area-inset-bottom));
+          }
+        }
+      }
+
+      @media (max-width: 640px) {
+        header {
+          padding: 1rem;
+        }
+
+        section {
+          padding: 1rem;
+        }
+
+        footer {
+          padding: 1rem;
+        }
+      }
+
+      @media (max-width: 360px) {
+        header h1 {
+          font-size: 1.05rem;
+          line-height: 1.35;
+        }
+
+        header p {
+          font-size: 0.78rem;
+        }
+
+        .brand-copy p:first-child {
+          font-size: 10px;
+        }
+
+        .brand-copy p:last-child {
+          font-size: 0.78rem;
+        }
+
+        .menu-item {
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (min-width: 2560px) {
+        :root {
+          --sidebar-expanded: 320px;
+          --sidebar-collapsed: 104px;
+        }
+
+        body {
+          font-size: 20px;
+        }
+
+        header h1 {
+          font-size: 2.4rem;
+        }
+
+        header p {
+          font-size: 1.15rem;
+        }
+
+        .menu-item {
+          font-size: 1.05rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .sidebar,
+        .sidebar.is-mobile-opening,
+        .sidebar.is-mobile-closing,
+        #mobile-sidebar-overlay {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="text-slate-800">
+    <div class="app-shell flex">
+      <aside id="sidebar" class="sidebar bg-slate-900 text-slate-100 flex flex-col">
+        <div class="p-4 border-b border-slate-700 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <img
+              src="https://cdn.jsdelivr.net/gh/BabuEiEi/images/สพฐ.02 ไม่มีขอบ.png"
+              alt="โลโก้ สพฐ."
+              class="h-10 w-10 object-contain"
+              loading="eager"
+            />
+            <div class="brand-copy overflow-hidden">
+              <p class="text-[11px] uppercase tracking-[0.2em] text-slate-300 whitespace-nowrap">Curriculum Submit</p>
+              <p class="text-sm font-medium text-slate-100 whitespace-nowrap">Dashboard</p>
+            </div>
+          </div>
+          <button
+            id="toggle-sidebar"
+            type="button"
+            class="h-9 w-9 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors flex items-center justify-center"
+            aria-label="ยุบหรือขยายเมนู"
+            title="ยุบเมนู"
+          >
+            <span id="toggle-icon" class="icon" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="p-4 border-b border-slate-700">
+          <p id="profile-name" class="profile-text text-sm font-semibold text-white truncate">-</p>
+          <p id="profile-role" class="profile-text text-xs text-slate-300 mt-1 truncate">-</p>
+          <p id="profile-school" class="profile-text text-xs text-slate-400 mt-1 truncate">-</p>
+        </div>
+
+        <nav id="menu-list" class="p-3 flex-1 space-y-1"></nav>
+
+        <div class="p-4 border-t border-slate-700">
+          <button
+            id="logout-btn"
+            type="button"
+            class="menu-item w-full rounded-lg bg-rose-600 hover:bg-rose-700 transition-colors text-sm font-medium px-3 py-2.5 flex items-center"
+            title="Logout"
+            aria-label="Logout"
+          >
+            <span class="icon" aria-hidden="true"><i data-lucide="log-out"></i></span>
+            <span class="label">Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <button
+        id="mobile-menu-open"
+        type="button"
+        class="fixed top-4 left-4 z-40 h-11 w-11 rounded-xl bg-slate-900 text-white shadow-lg"
+        aria-label="เปิดเมนู"
+        title="เปิดเมนู"
+      >
+        <span aria-hidden="true">☰</span>
+      </button>
+      <div id="mobile-sidebar-overlay" aria-hidden="true"></div>
+
+      <main class="content-area flex-1 flex flex-col">
+        <header class="px-6 py-5 border-b border-slate-200 bg-white/70 backdrop-blur-sm">
+          <h1 class="text-xl md:text-2xl font-bold text-slate-900">ระบบส่งงานหลักสูตรสถานศึกษา 68 ปีการศึกษา 2569</h1>
+          <p class="text-sm text-slate-600 mt-1">ยินดีต้อนรับเข้าสู่ระบบจัดการข้อมูลหลักสูตร</p>
+        </header>
+
+        <section class="flex-1 p-6 md:p-8">
+          <div id="page-content"></div>
+        </section>
+
+        <footer class="px-6 py-5 border-t border-slate-200 bg-white text-sm text-slate-600">
+          สำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน
+          <br />
+          กระทรวงศึกษาธิการ
+        </footer>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/dashboard.js"></script>
+    <script
+      src="https://unpkg.com/lucide@latest"
+      defer
+      onload="window.renderLucideIcons && window.renderLucideIcons()"
+    ></script>
+  </body>
+</html>
